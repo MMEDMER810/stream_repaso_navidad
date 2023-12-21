@@ -5,10 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class StreamsTest {
@@ -102,7 +101,12 @@ class StreamsTest {
 			
 			List<Pedido> list = pedHome.findAll();
 				
-			//TODO STREAMS	
+			List<String> res = list.stream()
+					.filter(p->p.getFecha().after(ultimoDia2016) && p.getTotal() > 500)
+					.map(p -> "ID:"+p.getId()+", Precio: "+p.getTotal()+", Fecha: "+p.getFecha()+", Nombre cliente: "+p.getCliente().getNombre())
+					.toList();
+
+			res.forEach(System.out::println);
 						
 			pedHome.commitTransaction();
 		}
@@ -128,7 +132,12 @@ class StreamsTest {
 	
 			List<Cliente> list = cliHome.findAll();
 			
-			//TODO STREAMS		
+			var res = list.stream()
+					.filter(c->c.getPedidos().toArray().length == 0)
+					.map(c->c.getId())
+					.toList();
+
+			res.forEach(System.out::println);
 		
 			cliHome.commitTransaction();
 			
@@ -152,9 +161,16 @@ class StreamsTest {
 		
 			List<Comercial> list = comHome.findAll();		
 			
-			//TODO STREAMS		
+			var res = list.stream()
+					.sorted(comparing(Comercial::getComisión).reversed())
+					.limit(1)
+					.map(c->"Comisión más alta: "+c.getComisión())
+					.toList();
+
+			res.forEach(System.out::println);
 				
 			comHome.commitTransaction();
+
 			
 		}
 		catch (RuntimeException e) {
@@ -179,6 +195,12 @@ class StreamsTest {
 			List<Cliente> list = cliHome.findAll();
 			
 			//TODO STREAMS
+			var res = list.stream()
+							.filter(c->c.getApellido2() != null)
+									.map(c-> "ID: "+c.getId() + ", Nombre: "+c.getNombre()+", apellido1: "+c.getApellido1()+", Apellido2: "+c.getApellido2())
+											.toList();
+
+			res.forEach(System.out::println);
 			
 			cliHome.commitTransaction();
 			
@@ -204,7 +226,14 @@ class StreamsTest {
 			List<Comercial> list = comHome.findAll();		
 			
 			//TODO STREAMS
-			
+			var res = list.stream()
+							.filter(c->c.getNombre().toLowerCase().substring(c.getNombre().length()-3, c.getNombre().length()-1).equals("el"))
+							.map(c->"Nombre: "+c.getNombre())
+									.toList();
+
+			res.forEach(System.out::println);
+
+
 			comHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
