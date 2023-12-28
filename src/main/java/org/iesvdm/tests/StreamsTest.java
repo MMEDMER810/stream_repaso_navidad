@@ -3,9 +3,12 @@ package org.iesvdm.tests;
 import org.iesvdm.streams.*;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.text.html.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -30,8 +33,7 @@ class StreamsTest {
 			list.forEach(System.out::println);
 		
 			
-			//TODO STREAMS
-			
+
 		
 			cliHome.commitTransaction();
 		}
@@ -51,8 +53,7 @@ class StreamsTest {
 		
 			List<Comercial> list = comHome.findAll();		
 			list.forEach(System.out::println);		
-			//TODO STREAMS
-		
+
 			comHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -72,8 +73,7 @@ class StreamsTest {
 			List<Pedido> list = pedHome.findAll();
 			list.forEach(System.out::println);	
 						
-			//TODO STREAMS
-		
+
 			pedHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -194,7 +194,7 @@ class StreamsTest {
 	
 			List<Cliente> list = cliHome.findAll();
 			
-			//TODO STREAMS
+
 			var res = list.stream()
 							.filter(c->c.getApellido2() != null)
 									.map(c-> "ID: "+c.getId() + ", Nombre: "+c.getNombre()+", apellido1: "+c.getApellido1()+", Apellido2: "+c.getApellido2())
@@ -225,11 +225,12 @@ class StreamsTest {
 		
 			List<Comercial> list = comHome.findAll();		
 			
-			//TODO STREAMS
 			var res = list.stream()
-							.filter(c->c.getNombre().toLowerCase().substring(c.getNombre().length()-3, c.getNombre().length()-1).equals("el"))
+							.filter(c-> c.getNombre().toLowerCase().substring(c.getNombre().length()-2, c.getNombre().length()).equals("el")
+							|| c.getNombre().toLowerCase().substring(c.getNombre().length()-1, c.getNombre().length()).equals("o"))
 							.map(c->"Nombre: "+c.getNombre())
-									.toList();
+							.distinct()
+							.toList();
 
 			res.forEach(System.out::println);
 
@@ -248,19 +249,29 @@ class StreamsTest {
 	 * 6. Devuelve un listado de todos los clientes que realizaron un pedido durante el año 2017, cuya cantidad esté entre 300 € y 1000 €.
 	 */
 	@Test
-	void test6() {
+	void test6() throws ParseException {
 	
 		PedidoHome pedHome = new PedidoHome();	
 		try {
 			pedHome.beginTransaction();
 		
 			List<Pedido> list = pedHome.findAll();
-						
-			//TODO STREAMS
-		
+
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date ultimoDia2016 = sdf.parse("2016-12-31");
+			Date primerDia2018 = sdf.parse("2018-01-01");
+
+			var res = list.stream()
+					.filter(p ->  p.getFecha().after(ultimoDia2016) && p.getFecha().before(primerDia2018)
+					&& p.getTotal() >= 300 && p.getTotal() <= 1000)
+					.map(p -> "Cliente: "+p.getCliente()+", fecha: "+p.getFecha()+", precio: "+p.getTotal())
+					.toList();
+
+			res.forEach(System.out::println);
+
 			pedHome.commitTransaction();
 		}
-		catch (RuntimeException e) {
+		catch (RuntimeException | ParseException e) {
 			pedHome.rollbackTransaction();
 		    throw e; // or display error message
 		}
@@ -282,8 +293,15 @@ class StreamsTest {
 			
 			List<Comercial> list = comHome.findAll();		
 			
-			//TODO STREAMS
-			
+			var res = list.stream()
+					.filter(c -> c.getNombre().toLowerCase().equals("daniel") && c.getApellido1().toLowerCase().equals("sáez"))
+					.flatMap(c->c.getPedidos().stream())
+					.mapToDouble(p -> ((Pedido) p).getTotal())
+					.average();
+
+			System.out.println(res.orElse(0.0));
+
+
 			comHome.commitTransaction();
 			
 		}
@@ -308,9 +326,12 @@ class StreamsTest {
 			pedHome.beginTransaction();
 		
 			List<Pedido> list = pedHome.findAll();
-						
-			//TODO STREAMS
-			
+
+			var res = list.stream()
+					.sorted(comparing(Pedido::getFecha))
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			pedHome.commitTransaction();
 		}
@@ -333,7 +354,11 @@ class StreamsTest {
 		
 			List<Pedido> list = pedHome.findAll();
 						
-			//TODO STREAMS
+			var res = list.stream()
+					.sorted(comparing(Pedido::getTotal).reversed())
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			pedHome.commitTransaction();
 		}
@@ -358,7 +383,14 @@ class StreamsTest {
 			List<Pedido> list = pedHome.findAll();
 						
 			
-			//TODO STREAMS
+			var res = list.stream()
+					//En la bbdd id del cliente no puede ser nulo así que no hace falta filtrar
+					//.filter(p->p.getCliente() != null)
+					.map(p-> p.getCliente().getId())
+					.distinct()
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			pedHome.commitTransaction();
 		}
@@ -383,7 +415,12 @@ class StreamsTest {
 			
 			List<Comercial> list = comHome.findAll();		
 			
-			//TODO STREAMS
+			var res = list.stream()
+					.filter(c->c.getComisión() >= 0.05 && c.getComisión() <= 0.11)
+					.map(c->c.getNombre() + " "+c.getApellido1()+" "+c.getApellido2())
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			comHome.commitTransaction();
 			
@@ -411,8 +448,13 @@ class StreamsTest {
 			
 			List<Comercial> list = comHome.findAll();		
 			
-			//TODO STREAMS
-			
+			var res = list.stream()
+					.sorted(comparing(Comercial::getComisión))
+					.map(c->c.getComisión())
+					.limit(1)
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			comHome.commitTransaction();
 			
@@ -440,8 +482,20 @@ class StreamsTest {
 			comHome.beginTransaction();
 			
 			List<Comercial> list = comHome.findAll();		
-			
+
+			//sorted y distinct no funcionan
 			//TODO STREAMS
+			var res = list.stream()
+							.flatMap(c->c.getPedidos().stream()
+									.filter(p -> ((Pedido) p).getCliente().getNombre().substring(0, 1).equals("A") && ((Pedido) p).getCliente().getNombre().substring((((Pedido) p).getCliente().getNombre()).length() -1, (((Pedido) p).getCliente().getNombre()).length()).equals("n")
+											|| ((Pedido) p).getCliente().getNombre().substring(0, 1).equals("P"))
+									.sorted(comparing(p -> ((Pedido) p).getCliente().getNombre()))
+									.map(p -> "Nombre: "+((Pedido) p).getCliente().getNombre()+" id:"+((Pedido) p).getCliente().getId())
+									.distinct()
+							)
+							.toList();
+
+			res.forEach(System.out::println);
 			
 			
 			comHome.commitTransaction();
@@ -469,7 +523,7 @@ class StreamsTest {
 	
 			List<Cliente> list = cliHome.findAll();
 			
-			//TODO STREAMS
+			//Como el anterior
 			
 			
 			cliHome.commitTransaction();
@@ -496,8 +550,12 @@ class StreamsTest {
 	
 			List<Cliente> list = cliHome.findAll();
 			
-			//TODO STREAMS
-			
+			var res = list.stream()
+							.filter(c->!c.getNombre().substring(0,1).equals("A"))
+							.sorted(comparing(Cliente::getNombre).thenComparing(Cliente::getApellido1).thenComparing(Cliente::getApellido2))
+							.toList();
+
+			res.forEach(System.out::println);
 			
 			cliHome.commitTransaction();
 			
@@ -525,7 +583,15 @@ class StreamsTest {
 			List<Pedido> list = pedHome.findAll();
 						
 			
-			//TODO STREAMS
+			var res = list.stream()
+					//En la bbdd id del cliente en pedido no puede ser nulo así que no hace falta filtrar, todos han hecho pedido
+					//.filter(p->p.getCliente() != null)
+					.sorted(comparing(p-> ((Pedido)p).getCliente().getApellido1()).thenComparing(p-> ((Pedido)p).getCliente().getApellido2()!=null?(((Pedido)p).getCliente().getApellido2()):"").thenComparing(p-> ((Pedido)p).getCliente().getNombre()))
+					.map(p-> "ID: "+p.getCliente().getId()+", nombre: "+p.getCliente().getNombre()+", apellidos: "+p.getCliente().getApellido1()+" "+p.getCliente().getApellido2())
+					.distinct()
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			pedHome.commitTransaction();
 		}
@@ -560,9 +626,15 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 	
 			List<Cliente> list = cliHome.findAll();
 			
-			//TODO STREAMS
-			
-			
+            var res = list.stream()
+                            .sorted(comparing(Cliente::getNombre))
+                            .map(c-> c + "\n\t"+c.getPedidos().stream()
+                                    .map(p -> ((Pedido)p).toString() + "\n\t")
+                                    .collect(Collectors.joining()))
+                            .toList();
+
+            res.forEach(System.out::println);
+
 			cliHome.commitTransaction();
 			
 		}
@@ -586,7 +658,17 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 			comHome.beginTransaction();
 			
-			List<Comercial> list = comHome.findAll();		
+			List<Comercial> list = comHome.findAll();
+
+            var res = list.stream()
+                    .filter(c->c.getPedidos() != null)
+                    .sorted(comparing(Comercial::getApellido1).thenComparing(Comercial::getApellido2))
+                    .map(c->c + "\n\t"+c.getPedidos().stream()
+                            .map(p -> ((Pedido)p).toString() + "\n\t")
+                            .collect(Collectors.joining()))
+                    .toList();
+
+            res.forEach(System.out::println);
 		
 			
 			comHome.commitTransaction();
@@ -613,7 +695,15 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 			List<Pedido> list = pedHome.findAll();
 						
 			
-			//TODO STREAMS
+			var res = list.stream()
+					.filter(p->p.getCliente().getNombre().toLowerCase().equals("maría")
+							&& p.getCliente().getApellido1().toLowerCase().equals("santana")
+							&& p.getCliente().getApellido2().toLowerCase().equals("moreno"))
+					.map(p->p.getComercial().getNombre() + " " + p.getComercial().getApellido1() + " "+p.getComercial().getApellido2())
+					.distinct()
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			
 			pedHome.commitTransaction();
@@ -638,7 +728,11 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 			
 			List<Comercial> list = comHome.findAll();		
 		
-			//TODO STREAMS
+			var res = list.stream()
+					.filter(c->c.getPedidos().isEmpty())
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			
 			comHome.commitTransaction();
@@ -663,7 +757,13 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 			List<Pedido> list = pedHome.findAll();
 						
-			//TODO STREAMS
+			var res = list.stream()
+					.map(p->p.getComercial())
+					.distinct()
+					.count();
+
+			System.out.println(res);
+
 			
 			
 			pedHome.commitTransaction();
@@ -686,8 +786,18 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 			List<Pedido> list = pedHome.findAll();
 						
-			//TODO STREAMS
-			
+			Optional<Double[]> res = list.stream()
+					.map(p-> new Double[]{p.getTotal(), p.getTotal()})
+					.reduce((acc, val) -> new Double[] {
+						Math.min(acc[0], val[0]),
+						Math.max(acc[1], val[1])
+					});
+
+			res.ifPresent(r-> {
+				System.out.println("Precio total mínimo: "+r[0]);
+				System.out.println("Precio total máximo: "+r[1]);
+
+			});
 
 			
 			pedHome.commitTransaction();
@@ -709,14 +819,19 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 		try {
 			cliHome.beginTransaction();
-	
+
 			List<Cliente> list = cliHome.findAll();
-			
-			//TODO STREAMS
-			
-			
+
+			var res = list.stream()
+					.filter(c->c.getCategoría() != null)
+					.map(c-> Map.entry(c.getCiudad(), c.getCategoría()))
+					.sorted((c1, c2) -> c2.getValue() - c1.getValue())
+					.toList();
+
+			res.forEach(System.out::println);
+
 			cliHome.commitTransaction();
-			
+
 		}
 		catch (RuntimeException e) {
 			cliHome.rollbackTransaction();
@@ -743,8 +858,26 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 			List<Pedido> list = pedHome.findAll();
 						
-			//TODO STREAMS
-			
+			var res = list.stream()
+					.collect(Collectors.groupingBy(
+							Pedido::getCliente,
+							Collectors.groupingBy(
+									Pedido::getFecha,
+									Collectors.maxBy(Comparator.comparingDouble(Pedido::getTotal))
+									)
+							)
+					);
+
+			res.forEach((cliente, maximosPorFecha) ->
+					maximosPorFecha.forEach((fecha, pedido) ->
+							System.out.println("Cliente: "
+											+ cliente.getId() + " "+cliente.getNombre()+" "+cliente.getApellido1()+ " "
+											+cliente.getApellido2() +
+									", Fecha: " + fecha +
+									", Pedido de máximo valor: " + pedido.get().getTotal())
+					)
+			);
+
 			pedHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -767,7 +900,26 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 			List<Pedido> list = pedHome.findAll();
 					
-			//TODO STREAMS
+			var res = list.stream()
+					.filter(p->p.getTotal() > 2000)
+					.collect(Collectors.groupingBy(
+									Pedido::getCliente,
+									Collectors.groupingBy(
+											Pedido::getFecha,
+											Collectors.maxBy(Comparator.comparingDouble(Pedido::getTotal))
+									)
+							)
+					);
+
+			res.forEach((cliente, maximosPorFecha) ->
+					maximosPorFecha.forEach((fecha, pedido) ->
+							System.out.println("Cliente: "
+									+ cliente.getId() + " "+cliente.getNombre()+" "+cliente.getApellido1()+ " "
+									+cliente.getApellido2() +
+									", Fecha: " + fecha +
+									", Pedido de máximo valor: " + pedido.get().getTotal())
+					)
+			);
 			
 			
 			pedHome.commitTransaction();
@@ -796,10 +948,17 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date ultimoDia2016 = sdf.parse("2016-12-31");
 			Date primerDia2018 = sdf.parse("2018-01-01");
-			
-			//TODO STREAMS
-			
-			
+
+			var res = list.stream()
+					.map(c->"Cliente: Id="+c.getId()+ " "+c.getNombre()+" "+c.getApellido1()+" "+c.getApellido2()+
+							" - Número de pedidos en 2017: "+
+							c.getPedidos().stream()
+									.filter(p-> ((Pedido)p).getFecha().after(ultimoDia2016)
+									&& ((Pedido)p).getFecha().before(primerDia2018)).count())
+					.toList();
+
+			res.forEach(System.out::println);
+
 			cliHome.commitTransaction();
 			
 		}
@@ -825,10 +984,18 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 					
 			Calendar calendar = Calendar.getInstance();
 			
-			
-			//TODO STREAMS
-					
-					
+			var res = list.stream()
+					.collect(Collectors.groupingBy(p -> p.getFecha().toString().substring(0,4)
+							, Collectors.maxBy(Comparator.comparing(Pedido::getTotal)))
+					);
+
+
+			res.forEach((fecha, pedido) ->
+					pedido.ifPresent((p) ->
+							System.out.println(fecha+": "+p)
+					)
+			);
+
 			pedHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -852,10 +1019,17 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 					
 			Calendar calendar = Calendar.getInstance();
 			
-			//TODO STREAMS
-					
-							
-					
+			var res = list.stream()
+					.collect(Collectors.groupingBy(p -> p.getFecha().toString().substring(0,4)
+							, Collectors.counting())
+					);
+
+
+			res.forEach((fecha, pedidos) ->
+							System.out.println(fecha + ": "+pedidos+" pedidos en total" )
+					);
+
+
 			pedHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -884,7 +1058,14 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 			Date ultimoDia2018 = sdf.parse("2018-12-31");
 			Date primerDia2020 = sdf.parse("2020-01-01");
 			
-			//TODO STREAMS
+			var res = list.stream()
+					.filter(p->p.getFecha().after(ultimoDia2018) && p.getFecha().before(primerDia2020))
+					.sorted((p1, p2) -> (int)p2.getTotal()-(int)p1.getTotal())
+					.limit(1)
+					.map(p->p.getCliente()+ ". Pedido más caro en 2019: "+p.getTotal()+"€")
+					.toList();
+
+			res.forEach(System.out::println);
 			
 				
 			pedHome.commitTransaction();
@@ -909,7 +1090,10 @@ Cliente [id=2, nombre=Adela, apellido1=Salas, apellido2=D�az, ciudad=Granada, 
 		
 			List<Pedido> list = pedHome.findAll();
 			
-			//TODO STREAMS
+			DoubleSummaryStatistics res = list.stream()
+							.collect(Collectors.summarizingDouble(p-> p.getTotal()));
+
+			System.out.println(res);
 				
 			pedHome.commitTransaction();
 		}

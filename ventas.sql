@@ -49,6 +49,7 @@ INSERT INTO comercial VALUES(6, 'Manuel','Domínguez', 'Hernández', 0.13);
 INSERT INTO comercial VALUES(7, 'Antonio','Vega', 'Hernández', 0.11);
 INSERT INTO comercial VALUES(8, 'Alfredo','Ruiz', 'Flores', 0.05);
 
+
 INSERT INTO pedido VALUES(1, 150.5, '2017-10-05', 5, 2);
 INSERT INTO pedido VALUES(2, 270.65, '2016-09-10', 1, 5);
 INSERT INTO pedido VALUES(3, 65.26, '2017-10-05', 2, 1);
@@ -66,6 +67,7 @@ INSERT INTO pedido VALUES(14, 145.82, '2017-02-02', 6, 1);
 INSERT INTO pedido VALUES(15, 370.85, '2019-03-11', 1, 5);
 INSERT INTO pedido VALUES(16, 2389.23, '2019-03-11', 1, 5);
 
-select * from cliente;
-
-select * from pedido;
+SELECT YEAR(fecha) AS anio, COUNT(*) AS cantidad_pedidos
+FROM pedido
+GROUP BY YEAR(fecha)
+ORDER BY anio;
