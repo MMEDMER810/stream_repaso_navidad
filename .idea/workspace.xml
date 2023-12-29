@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="edb1dfdc-a7b2-4f83-84bf-765af060388d" name="Changes" comment="Completado">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/iesvdm/tests/StreamsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/iesvdm/tests/StreamsTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ventas.sql" beforeDir="false" afterPath="$PROJECT_DIR$/ventas.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,8 +66,8 @@
       <recent name="$PROJECT_DIR$/src/main/java/org/iesvdm" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.StreamsTest.test27">
-    <configuration name="StreamsTest.test24" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.StreamsTest.test14">
+    <configuration name="StreamsTest.test13" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="stream" />
       <extension name="coverage">
         <pattern>
@@ -80,7 +77,23 @@
       </extension>
       <option name="PACKAGE_NAME" value="org.iesvdm.tests" />
       <option name="MAIN_CLASS_NAME" value="org.iesvdm.tests.StreamsTest" />
-      <option name="METHOD_NAME" value="test24" />
+      <option name="METHOD_NAME" value="test13" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StreamsTest.test14" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="stream" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.iesvdm.tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.iesvdm.tests" />
+      <option name="MAIN_CLASS_NAME" value="org.iesvdm.tests.StreamsTest" />
+      <option name="METHOD_NAME" value="test14" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -134,29 +147,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StreamsTest.test30" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="stream" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.iesvdm.tests.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.iesvdm.tests" />
-      <option name="MAIN_CLASS_NAME" value="org.iesvdm.tests.StreamsTest" />
-      <option name="METHOD_NAME" value="test30" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.StreamsTest.test14" />
+        <item itemvalue="JUnit.StreamsTest.test13" />
         <item itemvalue="JUnit.StreamsTest.test27" />
         <item itemvalue="JUnit.StreamsTest.test28" />
         <item itemvalue="JUnit.StreamsTest.test25" />
-        <item itemvalue="JUnit.StreamsTest.test24" />
-        <item itemvalue="JUnit.StreamsTest.test30" />
       </list>
     </recent_temporary>
   </component>
@@ -181,7 +178,8 @@
       <workItem from="1703594302136" duration="6256000" />
       <workItem from="1703622382729" duration="3879000" />
       <workItem from="1703681240226" duration="7382000" />
-      <workItem from="1703761048004" duration="7167000" />
+      <workItem from="1703761048004" duration="7196000" />
+      <workItem from="1703892506511" duration="1622000" />
     </task>
     <task id="LOCAL-00001" summary="Inicial">
       <option name="closed" value="true" />
@@ -191,7 +189,15 @@
       <option name="project" value="LOCAL" />
       <updated>1703153699527</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Completado">
+      <option name="closed" value="true" />
+      <created>1703777253527</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703777253527</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

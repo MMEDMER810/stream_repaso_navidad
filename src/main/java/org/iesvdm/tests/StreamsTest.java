@@ -483,21 +483,19 @@ class StreamsTest {
 			
 			List<Comercial> list = comHome.findAll();		
 
-			//sorted y distinct no funcionan
-			//TODO STREAMS
 			var res = list.stream()
 							.flatMap(c->c.getPedidos().stream()
-									.filter(p -> ((Pedido) p).getCliente().getNombre().substring(0, 1).equals("A") && ((Pedido) p).getCliente().getNombre().substring((((Pedido) p).getCliente().getNombre()).length() -1, (((Pedido) p).getCliente().getNombre()).length()).equals("n")
+									.filter(p -> ((Pedido) p).getCliente().getNombre().substring(0, 1).equals("A")
+											&& ((Pedido) p).getCliente().getNombre().substring((((Pedido) p).getCliente().getNombre()).length() -1, (((Pedido) p).getCliente().getNombre()).length()).equals("n")
 											|| ((Pedido) p).getCliente().getNombre().substring(0, 1).equals("P"))
-									.sorted(comparing(p -> ((Pedido) p).getCliente().getNombre()))
-									.map(p -> "Nombre: "+((Pedido) p).getCliente().getNombre()+" id:"+((Pedido) p).getCliente().getId())
-									.distinct()
 							)
-							.toList();
+					.sorted(comparing(p -> ((Pedido) p).getCliente().getNombre()))
+					.map(p ->((Pedido) p).getCliente().getNombre())
+					.distinct()
+					.toList();
 
 			res.forEach(System.out::println);
-			
-			
+
 			comHome.commitTransaction();
 			
 		}
@@ -522,9 +520,16 @@ class StreamsTest {
 			cliHome.beginTransaction();
 	
 			List<Cliente> list = cliHome.findAll();
-			
-			//Como el anterior
-			
+
+			var res = list.stream()
+					.filter(c -> c.getNombre().substring(0, 1).equals("A") && c.getNombre().substring(c.getNombre().length() -1, c.getNombre().length()).equals("n")
+									||  c.getNombre().substring(0, 1).equals("P"))
+					.sorted(comparing(Cliente::getNombre))
+					.map(c ->c.getNombre())
+					.distinct()
+					.toList();
+
+			res.forEach(System.out::println);
 			
 			cliHome.commitTransaction();
 			
